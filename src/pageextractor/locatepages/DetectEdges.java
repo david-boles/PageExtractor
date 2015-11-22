@@ -76,8 +76,8 @@ public final class DetectEdges {
 				
 				for(int iX = -rad; iX <= rad; iX++) {
 					for(int iY = -rad; iY <= rad; iY++) {
-						hTotal += i.getPixel(x+iX, y+iY)[0] * hM[iX+rad][iY+rad];
-						vTotal += i.getPixel(x+iX, y+iY)[0] * vM[iX+rad][iY+rad];
+						hTotal += i.getPixel(x+iX, y+iY)[0] * hM[iX+rad][iY+rad]*5;
+						vTotal += i.getPixel(x+iX, y+iY)[0] * vM[iX+rad][iY+rad]*5;
 					}
 				}
 				
