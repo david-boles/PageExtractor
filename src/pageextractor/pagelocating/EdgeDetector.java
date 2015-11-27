@@ -1,11 +1,11 @@
-package pageextractor.locatepages;
+package pageextractor.pagelocating;
 
 import java.awt.image.BufferedImage;
 
 import com.deb.lib.image.BGRAYImage;
 import com.deb.lib.image.FloatingImage;
 
-public final class DetectEdges {
+public final class EdgeDetector {
 	static final float[][] B1 = {
 			{0.06666666f,	0.13333333f,	0.06666666f},
 			{0.13333333f,	0.2f,			0.13333333f},
@@ -36,8 +36,8 @@ public final class DetectEdges {
 	static final float[][][] EH = {null, EH1};
 	static final float[][][] EV = {null, EV1};
 	
-	public static FloatingImage detectEdges(BGRAYImage i) {
-		return detectEdges(new FloatingImage(i), 1)[0];
+	public static FloatingImage detectEdges(FloatingImage i) {
+		return detectEdges(i, 1)[0];
 	}
 	
 	static FloatingImage applyBlur(FloatingImage i, int rad) {
@@ -89,7 +89,7 @@ public final class DetectEdges {
 		
 		for(int x = 0; x < i.getWidth(); x++) {
 			for(int y = 0; y < i.getHeight(); y++) {
-				outE.setPixel(x, y, new float[]{Math.abs((tH.getPixel(x, y)[0] + tV.getPixel(x, y)[0])/2)});
+				outE.setPixel(x, y, new float[]{Math.abs((tH.getPixel(x, y)[0] + tV.getPixel(x, y)[0])/2)});//NOTE: Yikes!
 			}
 		}
 		
