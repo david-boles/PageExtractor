@@ -10,18 +10,61 @@ import com.deb.lib.image.IRGBImage;
 public class FiducialLocator {
 	
 	public static Fiducial[] locateFiducials(IRGBImage iI) {
-		return locateFiducials(iI, new Color(75, 75, 75));
+		return locateFiducials(iI, 1, new Color(75, 75, 75), 0.5f, 0.5f);
 	}
 	
-	public static Fiducial[] locateFiducials(IRGBImage iI, Color blackRef) {
+	public static Fiducial[] locateFiducials(IRGBImage iI, int blurRadius, Color blackRef, float minCompRatio, float minEDDR) {
 		FloatingImage i = new FloatingImage(iI);
-		i = applyBlur(i, 2);
+		i = applyBlur(i, blurRadius);
 		ArrayList<CenterPixelGroup> Gs = group(getAreBlack(i, blackRef), i);
+		removeOOM(Gs, minCompRatio, minEDDR);
 		printTest(Gs);
 		
 		return null;
 	}
 	
+	static void removeOOM(ArrayList<CenterPixelGroup> gs, float minCompRatio, float minEDDR) {
+		for(int i = 0; i < gs.size(); i++) {
+			gs.get(i).updateGroupStats();
+		}
+		
+		for(int i = 0; i < gs.size(); i++) {
+			if(getMaxToOtherRatio(gs.get(i)) < minCompRatio) {
+				gs.remove(i);
+				i--;
+			}
+		}
+		
+		for(int i = 0; i < gs.size(); i++) {
+			if(gs.get(i).edgeDistanceDeviation < minEDDR) {
+				gs.remove(i);
+				i--;
+			}
+		}
+	}
+	
+	static float getMaxToOtherRatio(CenterPixelGroup cpg) {
+		float high = 0;
+		float low = Float.MIN_NORMAL;
+		
+		if(cpg.rB > cpg.gB && cpg.rB > cpg.bB) {
+			high+=cpg.rB;
+			low+=cpg.gB+cpg.bB;
+		}
+		
+		if(cpg.gB > cpg.rB && cpg.gB > cpg.bB) {
+			high+=cpg.gB;
+			low+=cpg.rB+cpg.bB;
+		}
+		
+		if(cpg.bB > cpg.rB && cpg.bB > cpg.gB) {
+			high+=cpg.bB;
+			low+=cpg.rB+cpg.gB;
+		}
+		
+		return high/low;
+	}
+
 	static ArrayList<CenterPixelGroup> group(boolean[][] b, FloatingImage i) {
 		ArrayList<CenterPixelGroup> Gs = new ArrayList<CenterPixelGroup>();
 		Pixel[][] p = new Pixel[b.length][b[0].length];
@@ -152,6 +195,12 @@ public class FiducialLocator {
 		return out;
 	}
 	
+	static final float[][] B0 = {
+			{0,		0,		0},
+			{0,		1,		0},
+			{0,		0,		0}
+	};
+	
 	static final float[][] B1 = {
 			{0.06666666f,	0.13333333f,	0.06666666f},
 			{0.13333333f,	0.2f,			0.13333333f},
@@ -166,7 +215,7 @@ public class FiducialLocator {
 			{1*0.015384615f,2*0.015384615f,3*0.015384615f,2*0.015384615f,1*0.015384615f}
 	};
 	
-	static final float[][][] B = {null, B1, B2};
+	static final float[][][] B = {B0, B1, B2};
 	
 	static FloatingImage applyBlur(FloatingImage i, int rad) {
 		float[][] m = B[rad];

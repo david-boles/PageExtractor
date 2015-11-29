@@ -41,9 +41,7 @@ public class CenterPixelGroup {
 				bTotal += members.get(i).bB;
 				cTotal++;
 				
-				float dis = (float) Math.sqrt((members.get(i).p.x^2)+(members.get(i).p.y^2));
-				if(dis > bDMax) bDMax = dis;
-				if(dis < bDMin) bDMin = dis;
+				
 			}
 			xTotal += members.get(i).p.x;
 			yTotal += members.get(i).p.y;
@@ -54,6 +52,18 @@ public class CenterPixelGroup {
 		this.bB = bTotal/cTotal;
 		this.gPosX = xTotal/this.members.size();
 		this.gPosY = yTotal/this.members.size();
+		
+		for(int i = 0; i < this.members.size(); i++) {
+			if(members.get(i).isBound) {
+				float xDis = members.get(i).p.x-this.gPosX;
+				float yDis = members.get(i).p.y-this.gPosY;
+				
+				float dis = (float) Math.sqrt((xDis*xDis)+(yDis*yDis));
+				if(dis > bDMax) bDMax = dis;
+				if(dis < bDMin) bDMin = dis;
+			}
+		}
+		
 		this.edgeDistanceDeviation = bDMin/bDMax;
 	}
 	

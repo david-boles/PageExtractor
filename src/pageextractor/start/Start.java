@@ -8,6 +8,6 @@ import pageextractor.fiducials.FiducialLocator;
 public class Start {
 
 	public static void main(String[] args) {
-		FiducialLocator.locateFiducials(new IRGBImage(ProgramFs.getProgramFile("testing/test4.png")));
+		FiducialLocator.locateFiducials(new IRGBImage(ProgramFs.getProgramFile("testing/blank.png")));
 	}
 }
