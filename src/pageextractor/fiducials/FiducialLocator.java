@@ -18,9 +18,32 @@ public class FiducialLocator {
 		i = applyBlur(i, blurRadius);
 		ArrayList<CenterPixelGroup> Gs = group(getAreBlack(i, blackRef), i);
 		removeOOM(Gs, minCompRatio, minEDDR);
-		printTest(Gs);
+		return toFiducials(Gs);
+	}
+	
+	static Fiducial[] toFiducials(ArrayList<CenterPixelGroup> gs) {
+		Fiducial[] out = new Fiducial[gs.size()];
+		for(int i = 0; i < gs.size(); i++) {
+			CenterPixelGroup g = gs.get(i);
+			out[i] = new Fiducial(g.gPosX, g.gPosY, getFiducialType(g), getMaxToOtherRatio(g));
+		}
+		return out;
+	}
+	
+	static int getFiducialType(CenterPixelGroup cpg) {
+		if(cpg.rB > cpg.gB && cpg.rB > cpg.bB) {
+			return Fiducial.TYPE_RED;
+		}
 		
-		return null;
+		if(cpg.gB > cpg.rB && cpg.gB > cpg.bB) {
+			return Fiducial.TYPE_GREEN;
+		}
+		
+		if(cpg.bB > cpg.rB && cpg.bB > cpg.gB) {
+			return Fiducial.TYPE_BLUE;
+		}
+		
+		return -1;
 	}
 	
 	static void removeOOM(ArrayList<CenterPixelGroup> gs, float minCompRatio, float minEDDR) {
